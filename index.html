@@ -2187,67 +2187,93 @@
         }
 
         // ============================================
-        // ANALYTICS TRACKING FUNCTIONS
-        // ============================================
-        function trackSectionView(el) {
-            const section = el.closest('section');
-            if (section && !section.dataset.tracked) {
-                section.dataset.tracked = 'true';
-                const sectionId = section.getAttribute('id') || 'unknown';
-                console.log(`📊 Section viewed: ${sectionId}`);
+// ANALYTICS TRACKING FUNCTIONS
+// ============================================
+function trackSectionView(el) {
+    const section = el.closest('section');
+    if (section && !section.dataset.tracked) {
+        section.dataset.tracked = 'true';
+        const sectionId = section.getAttribute('id') || 'unknown';
+        console.log(`📊 Section viewed: ${sectionId}`);
 
-                if (typeof gtag === 'function') {
-                    gtag('event', 'section_view', {
-                        'section_id': sectionId
-                    });
-                }
-            }
-        }
-
-        function trackSoftwareClick(name) {
-            console.log(`📊 Software clicked: ${name}`);
-            showToast(`Viewing: ${name}`, 'info');
-
-            if (typeof gtag === 'function') {
-                gtag('event', 'select_content', {
-                    'content_type': 'software',
-                    'item_name': name
-                });
-            }
-        }
-
-        function trackPortfolioClick(name) {
-            console.log(`📊 Portfolio project clicked: ${name}`);
-
-            if (typeof gtag === 'function') {
-                gtag('event', 'select_content', {
-                    'content_type': 'portfolio_project',
-                    'item_name': name
-                });
-            }
-
-            // Also track as outbound link
-            if (typeof gtag === 'function') {
-                gtag('event', 'click', {
-                    'link_url': name,
-                    'outbound': true
-                });
-            }
-        }
-
-        // Track social link clicks
-        document.querySelectorAll('.social-links a').forEach(link => {
-            link.addEventListener('click', function () {
-                const platform = this.getAttribute('title') || 'social';
-                console.log(`📊 Social link clicked: ${platform}`);
-
-                if (typeof gtag === 'function') {
-                    gtag('event', 'social_click', {
-                        'platform': platform
-                    });
-                }
+        if (typeof gtag === 'function') {
+            gtag('event', 'section_view', {
+                'section_id': sectionId
             });
+        }
+    }
+}
+
+function trackSoftwareClick(name) {
+    console.log(`📊 Software clicked: ${name}`);
+    showToast(`Viewing: ${name}`, 'info');
+
+    if (typeof gtag === 'function') {
+        gtag('event', 'select_content', {
+            'content_type': 'software',
+            'item_name': name
         });
+    }
+}
+
+function trackPortfolioClick(name) {
+    console.log(`📊 Portfolio project clicked: ${name}`);
+
+    if (typeof gtag === 'function') {
+        gtag('event', 'select_content', {
+            'content_type': 'portfolio_project',
+            'item_name': name
+        });
+
+        // Also track as outbound link
+        gtag('event', 'click', {
+            'link_url': name,
+            'outbound': true
+        });
+    }
+}
+
+// ============================================
+// TRACK DOCUMENT CLICKS (NEW)
+// ============================================
+function trackDocumentClick(name) {
+    console.log(`📊 Document viewed: ${name}`);
+
+    // Show a small toast notification
+    showToast(`Opening: ${name}`, 'info');
+
+    if (typeof gtag === 'function') {
+        // GA4 recommended event for PDF/file downloads
+        gtag('event', 'file_download', {
+            'file_name': name,
+            'file_type': 'pdf',
+            'link_url': name
+        });
+
+        // Also track as a general "select_content" event
+        // so it appears alongside your other content clicks in GA4
+        gtag('event', 'select_content', {
+            'content_type': 'document',
+            'item_name': name
+        });
+    }
+}
+
+// ============================================
+// TRACK SOCIAL LINK CLICKS
+// ============================================
+document.querySelectorAll('.social-links a').forEach(link => {
+    link.addEventListener('click', function () {
+        const platform = this.getAttribute('title') || 'social';
+        console.log(`📊 Social link clicked: ${platform}`);
+
+        if (typeof gtag === 'function') {
+            gtag('event', 'social_click', {
+                'platform': platform
+            });
+        }
+    });
+});
 
         // ============================================
         // INITIALIZE
